@@ -3,10 +3,8 @@ package controllers
 import (
 	"net/http"
 	"superhoneypotguard/database"
-	"superhoneypotguard/middleware"
 	"superhoneypotguard/models"
 	"superhoneypotguard/utils"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -181,9 +179,4 @@ func (ctrl *PermissionController) Delete(c *gin.Context) {
 	}
 
 	utils.SuccessResponse(c, nil)
-}
-
-func parseInt(s string) int {
-	result, _ := strconv.Atoi(s)
-	return result
 }

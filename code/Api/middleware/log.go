@@ -4,11 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"net/http"
+	"time"
+
 	"superhoneypotguard/database"
 	"superhoneypotguard/models"
-	"superhoneypotguard/utils"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -42,8 +41,8 @@ func LogMiddleware() gin.HandlerFunc {
 		c.Next()
 
 		duration := time.Since(startTime).Milliseconds()
-
 		responseBody := w.body.String()
+
 		var responseData map[string]interface{}
 		status := 1
 		if err := json.Unmarshal([]byte(responseBody), &responseData); err == nil {
@@ -67,7 +66,7 @@ func LogMiddleware() gin.HandlerFunc {
 
 		method := c.Request.Method
 		path := c.FullPath()
-		ip := utils.GetClientIP(c)
+		ip := c.ClientIP()
 
 		var paramsStr string
 		if len(requestBody) > 0 {

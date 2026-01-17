@@ -2,10 +2,11 @@ package middleware
 
 import (
 	"net/http"
-	"superhoneypotguard/config"
-	"superhoneypotguard/utils"
 	"sync"
 	"time"
+
+	"superhoneypotguard/config"
+	"superhoneypotguard/utils"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"
@@ -82,8 +83,7 @@ func InitRateLimiter() {
 
 func RateLimitMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ip := utils.GetClientIP(c)
-		limiter := globalLimiter.getLimiter(ip)
+		limiter := globalLimiter.getLimiter(c.ClientIP())
 
 		if !limiter.Allow() {
 			utils.ErrorResponse(c, http.StatusTooManyRequests, "请求过于频繁，请稍后再试")
@@ -97,7 +97,6 @@ func RateLimitMiddleware() gin.HandlerFunc {
 
 func AuthRateLimitMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ip := utils.GetClientIP(c)
 		limiter := rate.NewLimiter(rate.Every(3*time.Minute), 5)
 
 		if !limiter.Allow() {

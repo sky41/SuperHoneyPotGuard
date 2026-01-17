@@ -6,7 +6,6 @@ import (
 	"superhoneypotguard/middleware"
 	"superhoneypotguard/models"
 	"superhoneypotguard/utils"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -155,9 +154,9 @@ func (ctrl *UserController) Update(c *gin.Context) {
 
 	currentUser := middleware.GetCurrentUser(c)
 	updates := map[string]interface{}{
-		"email":     req.Email,
-		"phone":     req.Phone,
-		"real_name": req.RealName,
+		"email":      req.Email,
+		"phone":      req.Phone,
+		"real_name":  req.RealName,
 		"updated_by": currentUser.UserID,
 	}
 
@@ -271,14 +270,4 @@ func (ctrl *UserController) ResetPassword(c *gin.Context) {
 	}
 
 	utils.SuccessResponse(c, nil)
-}
-
-func parseInt(s string) int {
-	var result int
-	for _, c := range s {
-		if c >= '0' && c <= '9' {
-			result = result*10 + int(c-'0')
-		}
-	}
-	return result
 }

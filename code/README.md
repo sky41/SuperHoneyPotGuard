@@ -10,7 +10,7 @@
   - 用户管理接口（列表、详情、创建、编辑、删除、状态更新、重置密码）
   - 角色管理接口（列表、详情、创建、编辑、删除）
   - 权限管理接口（树形结构、列表、详情、创建、编辑、删除）
-- 前端 Web 应用（React + Ant Design）
+- 前端 Web 应用（Vue3 + Ant Design Vue）
   - 登录页面
   - 主布局（侧边栏导航、顶部栏）
   - 首页仪表盘
@@ -63,15 +63,18 @@ SuperHoneyPotGuard/
 │   │       ├── api/
 │   │       │   └── index.js
 │   │       ├── layouts/
-│   │       │   └── MainLayout.jsx
-│   │       ├── pages/
-│   │       │   ├── Login.jsx
-│   │       │   ├── Dashboard.jsx
-│   │       │   └── UserManage.jsx
+│   │       │   └── MainLayout.vue
+│   │       ├── router/
+│   │       │   └── index.js
+│   │       ├── views/
+│   │       │   ├── Login.vue
+│   │       │   ├── Dashboard.vue
+│   │       │   └── UserManage.vue
 │   │       ├── utils/
 │   │       │   └── request.js
-│   │       ├── index.css
-│   │       └── main.jsx
+│   │       ├── App.vue
+│   │       ├── main.js
+│   │       └── style.css
 │   └── README.md
 └── docs/
     └── 技术栈.md
@@ -255,9 +258,10 @@ npm run dev
 - 令牌桶限流
 
 ### 前端
-- React 18.2+
-- Ant Design 5.12+
-- React Router 6.20+
+- Vue 3.4+
+- Ant Design Vue 4.0+
+- Vue Router 4.2+
+- Pinia 2.1+
 - Axios 1.6+
 - Vite 5.0+
 
