@@ -4,7 +4,10 @@ export const authAPI = {
   register: (data) => request.post('/auth/register', data),
   login: (data) => request.post('/auth/login', data),
   logout: () => request.post('/auth/logout'),
-  getCurrentUser: () => request.get('/auth/current')
+  getCurrentUser: () => request.get('/auth/current'),
+  sendVerificationCode: (data) => request.post('/auth/send-verification-code', data),
+  sendResetPasswordCode: (data) => request.post('/auth/send-reset-code', data),
+  resetPassword: (data) => request.post('/password/reset', data)
 }
 
 export const userAPI = {
@@ -44,4 +47,12 @@ export const logAPI = {
   getById: (id) => request.get(`/log/${id}`),
   delete: (id) => request.delete(`/log/${id}`),
   clear: () => request.delete('/log/clear')
+}
+
+export const hfishAPI = {
+  getAttackIPs: () => request.post('/hfish/attack/ips'),
+  getAttackDetails: () => request.post('/hfish/attack/details'),
+  getAccountInfo: () => request.post('/hfish/account/info'),
+  getSysInfo: () => request.get('/hfish/sys/info'),
+  blockIP: (data) => request.post('/hfish/block/ip', data)
 }

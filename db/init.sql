@@ -138,7 +138,7 @@ CREATE TABLE `operation_logs` (
 
 -- 插入默认管理员用户
 INSERT INTO `users` (`username`, `password`, `email`, `real_name`, `status`) VALUES
-('admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin@example.com', '系统管理员', 1);
+('admin', '$2a$10$jpAuFuZNn.EC9WJzawqvs.TvFf/IJJoMLM5FSv9Vnqt3FWM7sNmfK', 'admin@example.com', '系统管理员', 1);
 
 -- 插入默认角色
 INSERT INTO `roles` (`role_name`, `role_code`, `description`, `status`) VALUES
@@ -155,7 +155,9 @@ INSERT INTO `permissions` (`permission_name`, `permission_code`, `permission_typ
 ('操作日志', 'log:manage', 'menu', 2, '/system/log', 'LogManage', 'FileTextOutlined', 4, '操作日志', 1),
 ('查看日志', 'log:view', 'button', 0, NULL, NULL, NULL, 1, '查看日志详情', 1),
 ('删除日志', 'log:delete', 'button', 0, NULL, NULL, NULL, 1, '删除日志', 1),
-('清空日志', 'log:clear', 'button', 0, NULL, NULL, NULL, 1, '清空所有日志', 1);
+('清空日志', 'log:clear', 'button', 0, NULL, NULL, NULL, 1, '清空所有日志', 1),
+('HFish 数据', 'hfish:view', 'menu', 0, '/hfish', 'HFishData', 'SecurityScanOutlined', 5, 'HFish 蜜罐数据查看', 1),
+('封禁 IP', 'hfish:block', 'button', 0, NULL, NULL, NULL, 1, '手动封禁 IP 地址', 1);
 
 -- 为超级管理员角色分配所有权限
 INSERT INTO `role_permissions` (`role_id`, `permission_id`)

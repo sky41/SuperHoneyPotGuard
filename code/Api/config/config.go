@@ -26,6 +26,10 @@ type Config struct {
 	RedisPort       string
 	RedisPassword   string
 	RedisDB         int
+	SMTPHost        string
+	SMTPPort        string
+	SMTPUser        string
+	SMTPPassword    string
 }
 
 var AppConfig *Config
@@ -55,6 +59,10 @@ func LoadConfig() {
 		RedisPort:       getEnv("REDIS_PORT", "6379"),
 		RedisPassword:   getEnv("REDIS_PASSWORD", "182asi@ioqwie.qdw"),
 		RedisDB:         getEnvAsInt("REDIS_DB", 0),
+		SMTPHost:        getEnv("SMTP_HOST", "smtp.163.com"),
+		SMTPPort:        getEnv("SMTP_PORT", "587"),
+		SMTPUser:        getEnv("SMTP_USER", "sky1417167991@163.com"),
+		SMTPPassword:    getEnv("SMTP_PASSWORD", "QMgM8dSFBSHex6YB"),
 	}
 }
 

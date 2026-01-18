@@ -14,6 +14,8 @@ func SetupRoutes(r *gin.Engine) {
 	permissionController := controllers.NewPermissionController()
 	dashboardController := controllers.NewDashboardController()
 	logController := controllers.NewLogController()
+	hfishController := controllers.NewHFishController()
+	passwordController := controllers.NewPasswordController()
 
 	api := r.Group("/api")
 	{
@@ -27,6 +29,8 @@ func SetupRoutes(r *gin.Engine) {
 
 		auth := api.Group("/auth")
 		{
+			auth.POST("/send-verification-code", authController.SendVerificationCode)
+			auth.POST("/send-reset-code", passwordController.SendResetPasswordCode)
 			auth.POST("/register", authController.Register)
 			auth.POST("/login", middleware.AuthRateLimitMiddleware(), authController.Login)
 			auth.POST("/logout", middleware.AuthMiddleware(), authController.Logout)
@@ -36,24 +40,24 @@ func SetupRoutes(r *gin.Engine) {
 		user := api.Group("/user")
 		user.Use(middleware.AuthMiddleware())
 		{
-			user.GET("/list", middleware.PermissionMiddleware("user:list"), userController.GetList)
-			user.GET("/:id", middleware.PermissionMiddleware("user:list"), userController.GetById)
-			user.POST("/", middleware.PermissionMiddleware("user:add"), userController.Create)
-			user.PUT("/:id", middleware.PermissionMiddleware("user:edit"), userController.Update)
-			user.DELETE("/:id", middleware.PermissionMiddleware("user:delete"), userController.Delete)
-			user.PATCH("/:id/status", middleware.PermissionMiddleware("user:edit"), userController.UpdateStatus)
-			user.POST("/:id/reset-password", middleware.PermissionMiddleware("user:edit"), userController.ResetPassword)
+			user.GET("/list", middleware.PermissionMiddleware("user:manage"), userController.GetList)
+			user.GET("/:id", middleware.PermissionMiddleware("user:manage"), userController.GetById)
+			user.POST("/", middleware.PermissionMiddleware("user:manage"), userController.Create)
+			user.PUT("/:id", middleware.PermissionMiddleware("user:manage"), userController.Update)
+			user.DELETE("/:id", middleware.PermissionMiddleware("user:manage"), userController.Delete)
+			user.PATCH("/:id/status", middleware.PermissionMiddleware("user:manage"), userController.UpdateStatus)
+			user.POST("/:id/reset-password", middleware.PermissionMiddleware("user:manage"), userController.ResetPassword)
 		}
 
 		role := api.Group("/role")
 		role.Use(middleware.AuthMiddleware())
 		{
-			role.GET("/list", middleware.PermissionMiddleware("role:list"), roleController.GetList)
-			role.GET("/all", middleware.PermissionMiddleware("role:list"), roleController.GetAll)
-			role.GET("/:id", middleware.PermissionMiddleware("role:list"), roleController.GetById)
-			role.POST("/", middleware.PermissionMiddleware("role:add"), roleController.Create)
-			role.PUT("/:id", middleware.PermissionMiddleware("role:edit"), roleController.Update)
-			role.DELETE("/:id", middleware.PermissionMiddleware("role:delete"), roleController.Delete)
+			role.GET("/list", middleware.PermissionMiddleware("role:manage"), roleController.GetList)
+			role.GET("/all", middleware.PermissionMiddleware("role:manage"), roleController.GetAll)
+			role.GET("/:id", middleware.PermissionMiddleware("role:manage"), roleController.GetById)
+			role.POST("/", middleware.PermissionMiddleware("role:manage"), roleController.Create)
+			role.PUT("/:id", middleware.PermissionMiddleware("role:manage"), roleController.Update)
+			role.DELETE("/:id", middleware.PermissionMiddleware("role:manage"), roleController.Delete)
 		}
 
 		permission := api.Group("/permission")
@@ -78,8 +82,25 @@ func SetupRoutes(r *gin.Engine) {
 		{
 			log.GET("/list", middleware.PermissionMiddleware("log:manage"), logController.GetList)
 			log.GET("/:id", middleware.PermissionMiddleware("log:manage"), logController.GetById)
-			log.DELETE("/:id", middleware.PermissionMiddleware("log:delete"), logController.Delete)
-			log.DELETE("/clear", middleware.PermissionMiddleware("log:clear"), logController.Clear)
+			log.DELETE("/:id", middleware.PermissionMiddleware("log:manage"), logController.Delete)
+			log.DELETE("/clear", middleware.PermissionMiddleware("log:manage"), logController.Clear)
+		}
+
+		hfish := api.Group("/hfish")
+		hfish.Use(middleware.AuthMiddleware())
+		{
+			hfish.GET("/attack/ips", middleware.PermissionMiddleware("hfish:view"), hfishController.GetAttackIPs)
+			hfish.GET("/attack/details", middleware.PermissionMiddleware("hfish:view"), hfishController.GetAttackDetails)
+			hfish.GET("/account/info", middleware.PermissionMiddleware("hfish:view"), hfishController.GetAccountInfo)
+			hfish.GET("/sys/info", middleware.PermissionMiddleware("hfish:view"), hfishController.GetSysInfo)
+			hfish.POST("/block/ip", middleware.PermissionMiddleware("hfish:block"), hfishController.BlockIP)
+		}
+
+		password := api.Group("/password")
+		password.Use(middleware.AuthMiddleware())
+		{
+			password.POST("/send-reset-code", passwordController.SendResetPasswordCode)
+			password.POST("/reset", passwordController.ResetPassword)
 		}
 
 		r.NoRoute(func(c *gin.Context) {

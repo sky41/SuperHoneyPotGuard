@@ -29,10 +29,38 @@
         >
           <a-input
             v-model:value="formState.email"
-            placeholder="请输入邮箱（可选）"
+            placeholder="请输入邮箱"
           >
+            <template #suffix>
+              <a-button
+                type="primary"
+                :disabled="countdown > 0"
+                @click="sendVerificationCode"
+                :loading="sendingCode"
+                size="small"
+              >
+                {{ countdown > 0 ? `${countdown}秒后重发` : '发送验证码' }}
+              </a-button>
+            </template>
             <template #prefix>
               <MailOutlined />
+            </template>
+          </a-input>
+        </a-form-item>
+
+        <a-form-item
+          v-if="!isLogin"
+          label="验证码"
+          name="code"
+          :rules="[{ required: true, message: '请输入验证码' }]"
+        >
+          <a-input
+            v-model:value="formState.code"
+            placeholder="请输入6位验证码"
+            maxlength="6"
+          >
+            <template #prefix>
+              <SafetyOutlined />
             </template>
           </a-input>
         </a-form-item>
@@ -109,6 +137,16 @@
             {{ isLogin ? '还没有账号？立即注册' : '已有账号？立即登录' }}
           </a-button>
         </a-form-item>
+
+        <a-form-item v-if="isLogin">
+          <a-button
+            type="link"
+            block
+            @click="goToResetPassword"
+          >
+            忘记密码？
+          </a-button>
+        </a-form-item>
       </a-form>
     </a-card>
   </div>
@@ -118,16 +156,21 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
-import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons-vue'
+import { UserOutlined, LockOutlined, MailOutlined, SafetyOutlined } from '@ant-design/icons-vue'
 import { authAPI } from '@/api'
 
 const router = useRouter()
 const loading = ref(false)
+const sendingCode = ref(false)
 const isLogin = ref(true)
+const countdown = ref(0)
+let countdownTimer = null
+
 const formState = ref({
   username: '',
   password: '',
   email: '',
+  code: '',
   confirmPassword: '',
   realName: ''
 })
@@ -138,9 +181,48 @@ const toggleMode = () => {
     username: '',
     password: '',
     email: '',
+    code: '',
     confirmPassword: '',
     realName: ''
   }
+  resetCountdown()
+}
+
+const resetCountdown = () => {
+  if (countdownTimer) {
+    clearInterval(countdownTimer)
+    countdownTimer = null
+  }
+  countdown.value = 0
+}
+
+const sendVerificationCode = async () => {
+  if (!formState.value.email) {
+    message.error('请先输入邮箱地址')
+    return
+  }
+
+  sendingCode.value = true
+  try {
+    await authAPI.sendVerificationCode({ email: formState.value.email })
+    message.success('验证码已发送到您的邮箱，有效期5分钟')
+    startCountdown()
+  } catch (error) {
+    console.error('发送验证码失败:', error)
+    message.error('发送验证码失败，请重试')
+  } finally {
+    sendingCode.value = false
+  }
+}
+
+const startCountdown = () => {
+  countdown.value = 60
+  countdownTimer = setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0) {
+      resetCountdown()
+    }
+  }, 1000)
 }
 
 const validatePassword = async (rule, value) => {
@@ -166,24 +248,31 @@ const handleFinish = async () => {
       await authAPI.register({
         username: formState.value.username,
         password: formState.value.password,
-        email: formState.value.email || undefined,
+        email: formState.value.email,
+        code: formState.value.code,
         realName: formState.value.realName || undefined
       })
       message.success('注册成功，请登录')
       isLogin.value = true
       formState.value = {
-        username: formState.value.username,
+        username: '',
         password: '',
         email: '',
+        code: '',
         confirmPassword: '',
         realName: ''
       }
     }
   } catch (error) {
     console.error(isLogin.value ? '登录失败:' : '注册失败:', error)
+    message.error(isLogin.value ? '登录失败' : '注册失败')
   } finally {
     loading.value = false
   }
+}
+
+const goToResetPassword = () => {
+  router.push('/reset-password')
 }
 </script>
 

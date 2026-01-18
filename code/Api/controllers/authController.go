@@ -5,6 +5,7 @@ import (
 	"superhoneypotguard/database"
 	"superhoneypotguard/middleware"
 	"superhoneypotguard/models"
+	"superhoneypotguard/services"
 	"superhoneypotguard/utils"
 	"time"
 
@@ -17,10 +18,48 @@ func NewAuthController() *AuthController {
 	return &AuthController{}
 }
 
-func (ctrl *AuthController) Register(c *gin.Context) {
-	var req models.RegisterRequest
+func (ctrl *AuthController) SendVerificationCode(c *gin.Context) {
+	var req struct {
+		Email string `json:"email" binding:"required,email"`
+	}
+
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, "参数验证失败")
+		return
+	}
+
+	emailService := services.NewEmailService()
+	if err := emailService.SendVerificationCode(req.Email); err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "发送验证码失败: "+err.Error())
+		return
+	}
+
+	utils.SuccessResponse(c, nil)
+}
+
+func (ctrl *AuthController) Register(c *gin.Context) {
+	var req struct {
+		Username string  `json:"username" binding:"required,min=3,max=50"`
+		Password string  `json:"password" binding:"required,min=6"`
+		Email    string  `json:"email" binding:"required,email"`
+		Code     string  `json:"code" binding:"required,len=6"`
+		Phone    *string `json:"phone"`
+		RealName *string `json:"realName"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.ErrorResponse(c, http.StatusBadRequest, "参数验证失败")
+		return
+	}
+
+	if req.Email == "" {
+		utils.ErrorResponse(c, http.StatusBadRequest, "邮箱不能为空")
+		return
+	}
+
+	emailService := services.NewEmailService()
+	if !emailService.VerifyCode(req.Email, req.Code) {
+		utils.ErrorResponse(c, http.StatusBadRequest, "验证码错误或已过期")
 		return
 	}
 
@@ -40,7 +79,7 @@ func (ctrl *AuthController) Register(c *gin.Context) {
 	user := models.User{
 		Username: req.Username,
 		Password: hashedPassword,
-		Email:    req.Email,
+		Email:    &req.Email,
 		Phone:    req.Phone,
 		RealName: req.RealName,
 		Status:   1,
@@ -63,7 +102,7 @@ func (ctrl *AuthController) Register(c *gin.Context) {
 	utils.SuccessResponse(c, gin.H{
 		"id":       user.ID,
 		"username": user.Username,
-		"email":     user.Email,
+		"email":    user.Email,
 	})
 }
 
@@ -142,11 +181,11 @@ func (ctrl *AuthController) Login(c *gin.Context) {
 	utils.SuccessResponse(c, gin.H{
 		"token": token,
 		"user": gin.H{
-			"id":         user.ID,
-			"username":   user.Username,
-			"email":      user.Email,
-			"realName":   user.RealName,
-			"roles":      roles,
+			"id":          user.ID,
+			"username":    user.Username,
+			"email":       user.Email,
+			"realName":    user.RealName,
+			"roles":       roles,
 			"permissions": permissions,
 		},
 	})
@@ -184,14 +223,14 @@ func (ctrl *AuthController) GetCurrentUser(c *gin.Context) {
 
 	utils.SuccessResponse(c, gin.H{
 		"user": gin.H{
-			"id":          dbUser.ID,
-			"username":    dbUser.Username,
-			"email":       dbUser.Email,
-			"realName":    dbUser.RealName,
-			"status":      dbUser.Status,
+			"id":            dbUser.ID,
+			"username":      dbUser.Username,
+			"email":         dbUser.Email,
+			"realName":      dbUser.RealName,
+			"status":        dbUser.Status,
 			"lastLoginTime": dbUser.LastLoginTime,
-			"createdAt":   dbUser.CreatedAt,
-			"updatedAt":   dbUser.UpdatedAt,
+			"createdAt":     dbUser.CreatedAt,
+			"updatedAt":     dbUser.UpdatedAt,
 		},
 		"roles":       roles,
 		"permissions": permissions,

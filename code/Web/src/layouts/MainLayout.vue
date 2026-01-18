@@ -44,6 +44,12 @@
           </template>
           操作日志
         </a-menu-item>
+        <a-menu-item key="/hfish">
+          <template #icon>
+            <SecurityScanOutlined />
+          </template>
+          HFish 数据
+        </a-menu-item>
       </a-menu>
     </a-layout-sider>
 
@@ -85,6 +91,7 @@ import {
   TeamOutlined,
   SafetyOutlined,
   FileTextOutlined,
+  SecurityScanOutlined,
   LogoutOutlined
 } from '@ant-design/icons-vue'
 import { authAPI } from '@/api'
@@ -101,7 +108,8 @@ const pageTitle = computed(() => {
     '/user': '用户管理',
     '/role': '角色管理',
     '/permission': '权限管理',
-    '/log': '操作日志'
+    '/log': '操作日志',
+    '/hfish': 'HFish 数据'
   }
   return titles[route.path] || '首页'
 })
