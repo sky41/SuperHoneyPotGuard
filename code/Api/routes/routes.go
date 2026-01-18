@@ -12,6 +12,8 @@ func SetupRoutes(r *gin.Engine) {
 	userController := controllers.NewUserController()
 	roleController := controllers.NewRoleController()
 	permissionController := controllers.NewPermissionController()
+	dashboardController := controllers.NewDashboardController()
+	logController := controllers.NewLogController()
 
 	api := r.Group("/api")
 	{
@@ -64,12 +66,27 @@ func SetupRoutes(r *gin.Engine) {
 			permission.PUT("/:id", middleware.PermissionMiddleware("permission:manage"), permissionController.Update)
 			permission.DELETE("/:id", middleware.PermissionMiddleware("permission:manage"), permissionController.Delete)
 		}
-	}
 
-	r.NoRoute(func(c *gin.Context) {
-		c.JSON(404, gin.H{
-			"success": false,
-			"message": "请求的资源不存在",
+		dashboard := api.Group("/dashboard")
+		dashboard.Use(middleware.AuthMiddleware())
+		{
+			dashboard.GET("/stats", middleware.PermissionMiddleware("dashboard:view"), dashboardController.GetStats)
+		}
+
+		log := api.Group("/log")
+		log.Use(middleware.AuthMiddleware())
+		{
+			log.GET("/list", middleware.PermissionMiddleware("log:manage"), logController.GetList)
+			log.GET("/:id", middleware.PermissionMiddleware("log:manage"), logController.GetById)
+			log.DELETE("/:id", middleware.PermissionMiddleware("log:delete"), logController.Delete)
+			log.DELETE("/clear", middleware.PermissionMiddleware("log:clear"), logController.Clear)
+		}
+
+		r.NoRoute(func(c *gin.Context) {
+			c.JSON(404, gin.H{
+				"success": false,
+				"message": "请求的资源不存在",
+			})
 		})
-	})
+	}
 }

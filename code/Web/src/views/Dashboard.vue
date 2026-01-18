@@ -2,10 +2,10 @@
   <div>
     <a-row :gutter="16" style="margin-bottom: 24px">
       <a-col :span="6">
-        <a-card>
+        <a-card :loading="loading">
           <a-statistic
             title="总用户数"
-            :value="0"
+            :value="stats.userCount"
             :value-style="{ color: '#3f8600' }"
           >
             <template #prefix>
@@ -15,10 +15,10 @@
         </a-card>
       </a-col>
       <a-col :span="6">
-        <a-card>
+        <a-card :loading="loading">
           <a-statistic
             title="角色数"
-            :value="0"
+            :value="stats.roleCount"
             :value-style="{ color: '#1890ff' }"
           >
             <template #prefix>
@@ -28,10 +28,10 @@
         </a-card>
       </a-col>
       <a-col :span="6">
-        <a-card>
+        <a-card :loading="loading">
           <a-statistic
             title="权限数"
-            :value="0"
+            :value="stats.permissionCount"
             :value-style="{ color: '#722ed1' }"
           >
             <template #prefix>
@@ -41,10 +41,10 @@
         </a-card>
       </a-col>
       <a-col :span="6">
-        <a-card>
+        <a-card :loading="loading">
           <a-statistic
             title="操作日志"
-            :value="0"
+            :value="stats.logCount"
             :value-style="{ color: '#cf1322' }"
           >
             <template #prefix>
@@ -69,7 +69,33 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { UserOutlined, TeamOutlined, SafetyOutlined, FileTextOutlined } from '@ant-design/icons-vue'
+import { dashboardAPI } from '@/api'
+
+const loading = ref(false)
+const stats = ref({
+  userCount: 0,
+  roleCount: 0,
+  permissionCount: 0,
+  logCount: 0
+})
+
+onMounted(() => {
+  fetchStats()
+})
+
+const fetchStats = async () => {
+  loading.value = true
+  try {
+    const res = await dashboardAPI.getStats()
+    stats.value = res.data
+  } catch (error) {
+    console.error('获取统计数据失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <style scoped>

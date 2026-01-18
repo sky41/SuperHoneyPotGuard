@@ -3,6 +3,9 @@ import Login from '@/views/Login.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
 import Dashboard from '@/views/Dashboard.vue'
 import UserManage from '@/views/UserManage.vue'
+import RoleManage from '@/views/RoleManage.vue'
+import PermissionManage from '@/views/PermissionManage.vue'
+import LogManage from '@/views/LogManage.vue'
 
 const routes = [
   {
@@ -23,6 +26,21 @@ const routes = [
         path: 'user',
         name: 'UserManage',
         component: UserManage
+      },
+      {
+        path: 'role',
+        name: 'RoleManage',
+        component: RoleManage
+      },
+      {
+        path: 'permission',
+        name: 'PermissionManage',
+        component: PermissionManage
+      },
+      {
+        path: 'log',
+        name: 'LogManage',
+        component: LogManage
       }
     ]
   }

@@ -34,3 +34,14 @@ export const permissionAPI = {
   update: (id, data) => request.put(`/permission/${id}`, data),
   delete: (id) => request.delete(`/permission/${id}`)
 }
+
+export const dashboardAPI = {
+  getStats: () => request.get('/dashboard/stats')
+}
+
+export const logAPI = {
+  getList: (params) => request.get('/log/list', { params }),
+  getById: (id) => request.get(`/log/${id}`),
+  delete: (id) => request.delete(`/log/${id}`),
+  clear: () => request.delete('/log/clear')
+}

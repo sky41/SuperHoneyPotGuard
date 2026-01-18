@@ -18,6 +18,12 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
+	log.Printf("数据库配置:")
+	log.Printf("  Host: %s", cfg.DBHost)
+	log.Printf("  Port: %s", cfg.DBPort)
+	log.Printf("  Name: %s", cfg.DBName)
+	log.Printf("  User: %s", cfg.DBUser)
+
 	database.InitDB()
 
 	middleware.InitRateLimiter()

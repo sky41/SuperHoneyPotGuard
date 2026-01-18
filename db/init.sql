@@ -1,10 +1,23 @@
--- 用户数据库表结构设计
--- 创建时间: 2026-01-17
--- 说明: 用户管理功能相关数据库表
-create database superhoneypotguard;
-use superhoneypotguard;
--- 用户表
-CREATE TABLE IF NOT EXISTS `users` (
+-- SuperHoneyPotGuard 数据库初始化脚本
+-- 提交目的：整合所有数据库表结构和初始数据到一个文件中，避免多文件导致数据库异常
+-- 提交内容：创建完整的数据库初始化脚本，包含所有表结构、索引、初始数据和权限配置
+-- 提交时间：2026-01-18
+
+-- 创建数据库
+CREATE DATABASE IF NOT EXISTS `superhoneypotguard` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `superhoneypotguard`;
+
+-- ========================================
+-- 1. 用户表
+-- ========================================
+DROP TABLE IF EXISTS `user_roles`;
+DROP TABLE IF EXISTS `role_permissions`;
+DROP TABLE IF EXISTS `operation_logs`;
+DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `roles`;
+DROP TABLE IF EXISTS `permissions`;
+
+CREATE TABLE `users` (
   `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
   `username` VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
   `password` VARCHAR(255) NOT NULL COMMENT '密码(加密后)',
@@ -23,8 +36,10 @@ CREATE TABLE IF NOT EXISTS `users` (
   INDEX `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
--- 角色表
-CREATE TABLE IF NOT EXISTS `roles` (
+-- ========================================
+-- 2. 角色表
+-- ========================================
+CREATE TABLE `roles` (
   `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '角色ID',
   `role_name` VARCHAR(50) NOT NULL UNIQUE COMMENT '角色名称',
   `role_code` VARCHAR(50) NOT NULL UNIQUE COMMENT '角色编码',
@@ -38,8 +53,10 @@ CREATE TABLE IF NOT EXISTS `roles` (
   INDEX `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色表';
 
--- 权限表
-CREATE TABLE IF NOT EXISTS `permissions` (
+-- ========================================
+-- 3. 权限表
+-- ========================================
+CREATE TABLE `permissions` (
   `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '权限ID',
   `permission_name` VARCHAR(50) NOT NULL COMMENT '权限名称',
   `permission_code` VARCHAR(100) NOT NULL UNIQUE COMMENT '权限编码',
@@ -58,8 +75,10 @@ CREATE TABLE IF NOT EXISTS `permissions` (
   INDEX `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='权限表';
 
--- 用户角色关联表
-CREATE TABLE IF NOT EXISTS `user_roles` (
+-- ========================================
+-- 4. 用户角色关联表
+-- ========================================
+CREATE TABLE `user_roles` (
   `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '关联ID',
   `user_id` BIGINT NOT NULL COMMENT '用户ID',
   `role_id` BIGINT NOT NULL COMMENT '角色ID',
@@ -72,8 +91,10 @@ CREATE TABLE IF NOT EXISTS `user_roles` (
   FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户角色关联表';
 
--- 角色权限关联表
-CREATE TABLE IF NOT EXISTS `role_permissions` (
+-- ========================================
+-- 5. 角色权限关联表
+-- ========================================
+CREATE TABLE `role_permissions` (
   `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '关联ID',
   `role_id` BIGINT NOT NULL COMMENT '角色ID',
   `permission_id` BIGINT NOT NULL COMMENT '权限ID',
@@ -86,8 +107,10 @@ CREATE TABLE IF NOT EXISTS `role_permissions` (
   FOREIGN KEY (`permission_id`) REFERENCES `permissions`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色权限关联表';
 
--- 操作日志表
-CREATE TABLE IF NOT EXISTS `operation_logs` (
+-- ========================================
+-- 6. 操作日志表
+-- ========================================
+CREATE TABLE `operation_logs` (
   `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '日志ID',
   `user_id` BIGINT COMMENT '用户ID',
   `username` VARCHAR(50) COMMENT '用户名',
@@ -109,6 +132,10 @@ CREATE TABLE IF NOT EXISTS `operation_logs` (
   INDEX `idx_created_at` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='操作日志表';
 
+-- ========================================
+-- 7. 初始数据
+-- ========================================
+
 -- 插入默认管理员用户
 INSERT INTO `users` (`username`, `password`, `email`, `real_name`, `status`) VALUES
 ('admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin@example.com', '系统管理员', 1);
@@ -120,15 +147,44 @@ INSERT INTO `roles` (`role_name`, `role_code`, `description`, `status`) VALUES
 
 -- 插入默认权限
 INSERT INTO `permissions` (`permission_name`, `permission_code`, `permission_type`, `parent_id`, `path`, `component`, `icon`, `sort_order`, `description`, `status`) VALUES
+('首页', 'dashboard:view', 'menu', 0, '/dashboard', 'Dashboard', 'DashboardOutlined', 0, '首页仪表盘', 1),
 ('系统管理', 'system', 'menu', 0, '/system', NULL, 'SettingOutlined', 1, '系统管理', 1),
-('用户管理', 'user:manage', 'menu', 1, '/system/user', 'UserManage', 'UserOutlined', 1, '用户管理', 1),
-('角色管理', 'role:manage', 'menu', 1, '/system/role', 'RoleManage', 'TeamOutlined', 2, '角色管理', 1),
-('权限管理', 'permission:manage', 'menu', 1, '/system/permission', 'PermissionManage', 'SafetyOutlined', 3, '权限管理', 1),
-('操作日志', 'log:manage', 'menu', 1, '/system/log', 'LogManage', 'FileTextOutlined', 4, '操作日志', 1);
+('用户管理', 'user:manage', 'menu', 2, '/system/user', 'UserManage', 'UserOutlined', 1, '用户管理', 1),
+('角色管理', 'role:manage', 'menu', 2, '/system/role', 'RoleManage', 'TeamOutlined', 2, '角色管理', 1),
+('权限管理', 'permission:manage', 'menu', 2, '/system/permission', 'PermissionManage', 'SafetyOutlined', 3, '权限管理', 1),
+('操作日志', 'log:manage', 'menu', 2, '/system/log', 'LogManage', 'FileTextOutlined', 4, '操作日志', 1),
+('查看日志', 'log:view', 'button', 0, NULL, NULL, NULL, 1, '查看日志详情', 1),
+('删除日志', 'log:delete', 'button', 0, NULL, NULL, NULL, 1, '删除日志', 1),
+('清空日志', 'log:clear', 'button', 0, NULL, NULL, NULL, 1, '清空所有日志', 1);
 
--- 为超级管理员分配所有权限
+-- 为超级管理员角色分配所有权限
 INSERT INTO `role_permissions` (`role_id`, `permission_id`)
-SELECT 1, id FROM `permissions`;
+SELECT 1, id FROM `permissions` WHERE status = 1;
 
 -- 为管理员分配超级管理员角色
 INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES (1, 1);
+
+-- ========================================
+-- 8. 验证数据
+-- ========================================
+
+-- 验证用户和权限
+SELECT
+    u.id as user_id,
+    u.username,
+    r.id as role_id,
+    r.role_name,
+    p.id as permission_id,
+    p.permission_code,
+    p.permission_name
+FROM users u
+INNER JOIN user_roles ur ON u.id = ur.user_id
+INNER JOIN roles r ON ur.role_id = r.id
+INNER JOIN role_permissions rp ON r.id = rp.role_id
+INNER JOIN permissions p ON rp.permission_id = p.id
+WHERE u.username = 'admin'
+ORDER BY p.permission_code;
+
+-- ========================================
+-- 数据库初始化完成
+-- ========================================

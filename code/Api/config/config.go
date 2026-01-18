@@ -39,11 +39,11 @@ func LoadConfig() {
 	AppConfig = &Config{
 		Port:            getEnv("PORT", "3000"),
 		GinMode:         getEnv("GIN_MODE", "debug"),
-		DBHost:          getEnv("DB_HOST", "localhost"),
+		DBHost:          getEnv("DB_HOST", "115.190.62.202"),
 		DBPort:          getEnv("DB_PORT", "3306"),
 		DBName:          getEnv("DB_NAME", "superhoneypotguard"),
 		DBUser:          getEnv("DB_USER", "root"),
-		DBPassword:      getEnv("DB_PASSWORD", ""),
+		DBPassword:      getEnv("DB_PASSWORD", "qwke23klja.Ki"),
 		JWTSecret:       getEnv("JWT_SECRET", "your_jwt_secret_key_here"),
 		JWTExpiresIn:    getEnv("JWT_EXPIRES_IN", "24h"),
 		BCryptCost:      getEnvAsInt("BCRYPT_COST", 10),
@@ -51,9 +51,9 @@ func LoadConfig() {
 		RateLimitMax:    getEnvAsInt("RATE_LIMIT_MAX_REQUESTS", 100),
 		LogLevel:        getEnv("LOG_LEVEL", "info"),
 		LogFilePath:     getEnv("LOG_FILE_PATH", "logs/"),
-		RedisHost:       getEnv("REDIS_HOST", "localhost"),
+		RedisHost:       getEnv("REDIS_HOST", "115.190.62.202"),
 		RedisPort:       getEnv("REDIS_PORT", "6379"),
-		RedisPassword:   getEnv("REDIS_PASSWORD", ""),
+		RedisPassword:   getEnv("REDIS_PASSWORD", "182asi@ioqwie.qdw"),
 		RedisDB:         getEnvAsInt("REDIS_DB", 0),
 	}
 }

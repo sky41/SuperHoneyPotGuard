@@ -38,6 +38,12 @@
           </template>
           权限管理
         </a-menu-item>
+        <a-menu-item key="/log">
+          <template #icon>
+            <FileTextOutlined />
+          </template>
+          操作日志
+        </a-menu-item>
       </a-menu>
     </a-layout-sider>
 
@@ -78,6 +84,7 @@ import {
   UserOutlined,
   TeamOutlined,
   SafetyOutlined,
+  FileTextOutlined,
   LogoutOutlined
 } from '@ant-design/icons-vue'
 import { authAPI } from '@/api'
@@ -93,7 +100,8 @@ const pageTitle = computed(() => {
     '/': '首页',
     '/user': '用户管理',
     '/role': '角色管理',
-    '/permission': '权限管理'
+    '/permission': '权限管理',
+    '/log': '操作日志'
   }
   return titles[route.path] || '首页'
 })
