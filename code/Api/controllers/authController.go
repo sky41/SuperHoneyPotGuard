@@ -28,7 +28,7 @@ func (ctrl *AuthController) SendVerificationCode(c *gin.Context) {
 		return
 	}
 
-	emailService := services.NewEmailService()
+	emailService := services.NewEmailService(database.DB)
 	if err := emailService.SendVerificationCode(req.Email); err != nil {
 		utils.ErrorResponse(c, http.StatusInternalServerError, "发送验证码失败: "+err.Error())
 		return
@@ -57,7 +57,7 @@ func (ctrl *AuthController) Register(c *gin.Context) {
 		return
 	}
 
-	emailService := services.NewEmailService()
+	emailService := services.NewEmailService(database.DB)
 	if !emailService.VerifyCode(req.Email, req.Code) {
 		utils.ErrorResponse(c, http.StatusBadRequest, "验证码错误或已过期")
 		return

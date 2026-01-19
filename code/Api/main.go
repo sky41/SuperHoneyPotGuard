@@ -6,6 +6,7 @@ import (
 	"superhoneypotguard/database"
 	"superhoneypotguard/middleware"
 	"superhoneypotguard/routes"
+	"superhoneypotguard/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,6 +26,13 @@ func main() {
 	log.Printf("  User: %s", cfg.DBUser)
 
 	database.InitDB()
+
+	// 初始化邮件服务，创建验证码表
+	if err := services.InitEmailService(database.DB); err != nil {
+		log.Printf("邮件服务初始化失败: %v", err)
+	} else {
+		log.Printf("邮件服务初始化成功")
+	}
 
 	middleware.InitRateLimiter()
 
