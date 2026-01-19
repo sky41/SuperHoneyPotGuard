@@ -69,11 +69,15 @@ type RolePermission struct {
 	CreatedBy    *int      `json:"created_by"`
 }
 
+// 提交目的：优化operation_logs表索引结构，提升INSERT性能
+// 提交内容：移除不必要的索引，保留核心查询索引，添加复合索引
+// 提交时间：2026-01-19
+
 type OperationLog struct {
 	ID          int       `json:"id" gorm:"primaryKey;autoIncrement"`
-	UserID      *int      `json:"userId" gorm:"column:user_id;index"`
-	Username    *string   `json:"username" gorm:"size:50;index"`
-	Operation   string    `json:"operation" gorm:"not null;size:100;index"`
+	UserID      *int      `json:"userId" gorm:"column:user_id;index:idx_user_created"`
+	Username    *string   `json:"username" gorm:"size:50"`
+	Operation   string    `json:"operation" gorm:"not null;size:100"`
 	Method      *string   `json:"method" gorm:"size:10"`
 	URL         *string   `json:"url" gorm:"size:500"`
 	IP          *string   `json:"ip" gorm:"size:50"`
@@ -83,7 +87,7 @@ type OperationLog struct {
 	Status      int       `json:"status" gorm:"default:1;comment:0-失败,1-成功"`
 	ErrorMsg    *string   `json:"errorMsg" gorm:"column:error_msg;size:500"`
 	ExecuteTime int       `json:"executeTime" gorm:"column:execute_time;comment:执行时间(ms)"`
-	CreatedAt   time.Time `json:"createdAt" gorm:"autoCreateTime;index"`
+	CreatedAt   time.Time `json:"createdAt" gorm:"autoCreateTime;index:idx_user_created"`
 }
 
 type RegisterRequest struct {
